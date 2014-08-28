@@ -35,9 +35,9 @@ func main() {
 		flag.PrintDefaults()
 	}
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
-	token := flag.String("token", "", "API token to use for authentication")
+	token := flag.String("token", "", "API token to use for authentication (required)")
 	output := flag.String("output", "csv", "output method. supported options: csv")
-	help := flag.Bool("help", false, "display help and exit")
+	help := flag.Bool("help", false, "if true, display help and exit")
 	flag.Parse()
 
 	if *help {
