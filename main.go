@@ -4,7 +4,7 @@ import (
 	"code.google.com/p/goauth2/oauth"
 	"flag"
 	"fmt"
-	"github.com/Clever/clever-to-csv/clevertable"
+	"github.com/Clever/clever-cli/clevertable"
 	csvSink "github.com/azylman/optimus/sinks/csv"
 	"github.com/azylman/optimus/transformer"
 	clevergo "gopkg.in/Clever/clever-go.v1"
