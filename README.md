@@ -24,6 +24,7 @@ $ clever-cli --token=DEMO_TOKEN sections list '{"subject":"math"}'
 
 There is one required command line flag:
   - token="": API token to use for authentication
+
 And three optional ones:
   - help=false: if true, display help and exit
   - host="https://api.clever.com": base URL of Clever API
@@ -36,7 +37,7 @@ Valid options are `students`, `schools`, `sections`, or `teachers`.
 
 ### Action
 
-What you want to do with that endpoint. Valid options are list.
+What you want to do with that endpoint. Valid options are list, which returns all the results.
 
 ### Query
 
