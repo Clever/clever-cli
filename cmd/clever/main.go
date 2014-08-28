@@ -72,6 +72,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	query := ""
+	if len(flag.Args()) > 2 {
+		query = flag.Args()[2]
+	}
+
 	transport := &oauth.Transport{
 		Token: &oauth.Token{AccessToken: *token},
 	}
@@ -79,8 +84,8 @@ func main() {
 	clever := clevergo.New(client, *host)
 
 	var params url.Values
-	if len(flag.Args()) > 2 {
-		params = url.Values{"where": []string{flag.Args()[2]}}
+	if query != "" {
+		params = url.Values{"where": []string{query}}
 	}
 
 	t := transformer.New(clevertable.New(endpoint, params, clever)).
