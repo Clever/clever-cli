@@ -3,6 +3,7 @@ package main
 import (
 	"code.google.com/p/goauth2/oauth"
 	"flag"
+	"fmt"
 	"github.com/Clever/clever-to-csv"
 	csvSink "github.com/azylman/optimus/sinks/csv"
 	"github.com/azylman/optimus/transformer"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"strings"
 )
 
 var acceptedEndpoints = []string{"students", "schools", "sections", "teachers"}
@@ -24,10 +26,24 @@ func validEndpoint(endpoint string) bool {
 }
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s: [options] endpoint action [query]\n\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "endpoints: %s\n\n", strings.Join(acceptedEndpoints, " "))
+		fmt.Fprintf(os.Stderr, "actions: list\n\n")
+		fmt.Fprintf(os.Stderr, "query:\n  -list: a JSON-stringified where query parameter\n\n")
+		fmt.Fprintf(os.Stderr, "options:\n")
+		flag.PrintDefaults()
+	}
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
 	token := flag.String("token", "", "API token to use for authentication")
 	output := flag.String("output", "csv", "output method. supported options: csv")
+	help := flag.Bool("help", false, "display help and exit")
 	flag.Parse()
+
+	if *help {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	for _, required := range []*string{host, token, output} {
 		if len(*required) == 0 {
@@ -41,16 +57,19 @@ func main() {
 	}
 
 	if len(flag.Args()) < 2 {
-		log.Fatal("need at least two arguments: endpoint action options")
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	endpoint := flag.Args()[0]
 	if !validEndpoint(endpoint) {
-		log.Fatalf("unknown endoint. supported endpoints: %#v", acceptedEndpoints)
+		flag.Usage()
+		os.Exit(1)
 	}
 	action := flag.Args()[1]
 	if action != "list" {
-		log.Fatal("unknown action. supported actions: list")
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	transport := &oauth.Transport{
