@@ -23,7 +23,7 @@ $ clever-cli --token=DEMO_TOKEN sections list '{"subject":"math"}'
 ### Options
 
 There is one required command line flag:
-  - token="": API token to use for authentication
+  - token: API token to use for authentication
 
 And three optional ones:
   - help=false: if true, display help and exit
