@@ -1,20 +1,17 @@
 SHELL := /bin/bash
-PKG = github.com/Clever/clever-to-csv
-PKGS = $(PKG)
+PKG = github.com/Clever/clever-cli
+SUBPKGSREL := $(shell ls -d */ | grep -v bin | grep -v deb)
+SUBPKGS = $(addprefix $(PKG)/,$(SUBPKGSREL))
+PKGS = $(PKG) $(SUBPKGS)
 
-.PHONY: test golint README
+.PHONY: test golint
 
 golint:
 	@go get github.com/golang/lint/golint
 
 test: $(PKGS)
 
-README.md: *.go
-	@go get github.com/robertkrimen/godocdown/godocdown
-	@godocdown $(PKG) > README.md
-README: README.md
-
-$(PKGS): golint README
+$(PKGS): golint
 	@go get -d -t $@
 	@gofmt -w=true $(GOPATH)/src/$@*/**.go
 ifneq ($(NOLINT),1)
