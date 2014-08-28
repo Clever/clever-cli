@@ -30,7 +30,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage of %s: [options] endpoint action [query]\n\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "endpoints: %s\n\n", strings.Join(acceptedEndpoints, " "))
 		fmt.Fprintf(os.Stderr, "actions: list\n\n")
-		fmt.Fprintf(os.Stderr, "query:\n  -list: a JSON-stringified where query parameter\n\n")
+		fmt.Fprintf(os.Stderr, "query:\n  - for list, a JSON-stringified where query parameter\n\n")
 		fmt.Fprintf(os.Stderr, "options:\n")
 		flag.PrintDefaults()
 	}
