@@ -25,6 +25,12 @@ func validEndpoint(endpoint string) bool {
 	return false
 }
 
+func exitWithArgError(msg string) {
+	fmt.Fprintf(os.Stderr, "%s\n\n", msg)
+	flag.Usage()
+	os.Exit(1)
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s: [options] endpoint action [query]\n\n", os.Args[0])
@@ -45,31 +51,28 @@ func main() {
 		os.Exit(0)
 	}
 
-	for _, required := range []*string{host, token, output} {
-		if len(*required) == 0 {
-			flag.Usage()
-			os.Exit(1)
+	for _, required := range [][2]string{{"host", *host}, {"token", *token}, {"output", *output}} {
+		name, value := required[0], required[1]
+		if len(value) == 0 {
+			exitWithArgError(fmt.Sprintf("must provide '%s'", name))
 		}
 	}
 
 	if *output != "csv" {
-		log.Fatal("supported output methods: csv")
+		exitWithArgError(fmt.Sprintf("'%s' is not a valid output", *output))
 	}
 
 	if len(flag.Args()) < 2 {
-		flag.Usage()
-		os.Exit(1)
+		exitWithArgError("need at least two arguments: endpoint and action")
 	}
 
 	endpoint := flag.Args()[0]
 	if !validEndpoint(endpoint) {
-		flag.Usage()
-		os.Exit(1)
+		exitWithArgError(fmt.Sprintf("'%s' is not a valid endpoint", endpoint))
 	}
 	action := flag.Args()[1]
 	if action != "list" {
-		flag.Usage()
-		os.Exit(1)
+		exitWithArgError(fmt.Sprintf("'%s' is not a valid action", action))
 	}
 
 	query := ""
