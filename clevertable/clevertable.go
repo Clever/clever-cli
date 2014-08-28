@@ -46,12 +46,15 @@ func (t *cleverTable) Stop() {
 	t.stopped = true
 }
 
+// New creates a Table that reads from Clever's API, using the specified parameters.
 func New(endpoint string, params url.Values, clever *clevergo.Clever) optimus.Table {
 	t := &cleverTable{rows: make(chan optimus.Row)}
 	go t.start(endpoint, params, clever)
 	return t
 }
 
+// FlattenRow takes a Row of nested maps and converts it into a flat Row, with the keys deepened.
+// For example, {"key1": {"key2": "val"}} would become {"key1.key2": "val"}.
 func FlattenRow(row optimus.Row) (optimus.Row, error) {
 	newRow := optimus.Row{}
 	for key, val := range row {
@@ -70,6 +73,8 @@ func FlattenRow(row optimus.Row) (optimus.Row, error) {
 	return newRow, nil
 }
 
+// StringifyArrayVals takes a Row and converts any arrays in the values into a JSON-marshalled
+// representation of the array.
 func StringifyArrayVals(row optimus.Row) (optimus.Row, error) {
 	newRow := optimus.Row{}
 	for key, val := range row {
