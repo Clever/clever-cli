@@ -12,18 +12,45 @@ import (
 	"os"
 )
 
+var acceptedEndpoints = []string{"students", "schools", "sections", "teachers"}
+
+func validEndpoint(endpoint string) bool {
+	for _, accepted := range acceptedEndpoints {
+		if endpoint == accepted {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
-	endpoint := flag.String("endpoint", "", "endpoint to download data from")
-	where := flag.String("where", "", "optional where query to limit results")
 	token := flag.String("token", "", "API token to use for authentication")
+	output := flag.String("output", "csv", "output method. supported options: csv")
 	flag.Parse()
 
-	for _, required := range []*string{host, token, endpoint} {
+	for _, required := range []*string{host, token, output} {
 		if len(*required) == 0 {
 			flag.Usage()
 			os.Exit(1)
 		}
+	}
+
+	if *output != "csv" {
+		log.Fatal("supported output methods: csv")
+	}
+
+	if len(flag.Args()) < 2 {
+		log.Fatal("need at least two arguments: endpoint action options")
+	}
+
+	endpoint := flag.Args()[0]
+	if !validEndpoint(endpoint) {
+		log.Fatalf("unknown endoint. supported endpoints: %#v", acceptedEndpoints)
+	}
+	action := flag.Args()[1]
+	if action != "list" {
+		log.Fatal("unknown action. supported actions: list")
 	}
 
 	transport := &oauth.Transport{
@@ -33,15 +60,15 @@ func main() {
 	clever := clevergo.New(client, *host)
 
 	var params url.Values
-	if *where != "" {
-		params = url.Values{"where": []string{*where}}
+	if len(flag.Args()) > 2 {
+		params = url.Values{"where": []string{flag.Args()[2]}}
 	}
 
-	t := transformer.New(clevertable.New(*endpoint, params, clever)).
+	t := transformer.New(clevertable.New(endpoint, params, clever)).
 		Map(clevertable.FlattenRow).
 		Map(clevertable.StringifyArrayVals).
 		Table()
-	if err := csvSink.New(t, *endpoint+".csv"); err != nil {
+	if err := csvSink.New(t, endpoint+".csv"); err != nil {
 		log.Fatal(err)
 	}
 }
