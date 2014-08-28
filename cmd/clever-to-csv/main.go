@@ -3,32 +3,67 @@ package main
 import (
 	"code.google.com/p/goauth2/oauth"
 	"flag"
+	"fmt"
 	"github.com/Clever/clever-to-csv"
 	csvSink "github.com/azylman/optimus/sinks/csv"
 	"github.com/azylman/optimus/transformer"
 	clevergo "gopkg.in/Clever/clever-go.v1"
 	"log"
+	"net/url"
 	"os"
-	"strings"
 	"sync"
 )
 
+type endpointConf struct {
+	Params url.Values
+	Name   string
+}
+
+func (e *endpointConf) Set(val string) error {
+	if val == "true" {
+		return nil
+	}
+	e.Params = url.Values{"where": []string{val}}
+	return nil
+}
+
+func (e *endpointConf) String() string {
+	return ""
+}
+
+func (e *endpointConf) IsBoolFlag() bool {
+	return true
+}
+
+var acceptedEndpoints = []string{"schools", "sections", "students", "teachers"}
+
 func main() {
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
-	endpoints := flag.String("endpoints", "schools,sections,students,teachers", "comma-delimited list of endpoints to pull")
+	for _, endpoint := range acceptedEndpoints {
+		end := &endpointConf{Name: endpoint}
+		flag.Var(end, endpoint, fmt.Sprintf("if included, dumps the %s endpoint. can optionally include JSON-stringified map of 'where' query parameters", endpoint))
+	}
 	token := flag.String("token", "", "API token to use for authentication")
 	flag.Parse()
 
-	for _, required := range []*string{host, endpoints, token} {
+	endpoints := []flag.Value{}
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name != "host" && f.Name != "token" {
+			endpoints = append(endpoints, f.Value)
+		}
+	})
+
+	for _, required := range []*string{host, token} {
 		if len(*required) == 0 {
 			flag.Usage()
 			os.Exit(1)
 		}
 	}
-	t := &oauth.Transport{
+
+	transport := &oauth.Transport{
 		Token: &oauth.Token{AccessToken: *token},
 	}
-	client := t.Client()
+	client := transport.Client()
 	clever := clevergo.New(client, *host)
 
 	wg := sync.WaitGroup{}
@@ -37,20 +72,26 @@ func main() {
 		wg.Wait()
 		close(errors)
 	}()
-	for _, endpoint := range strings.Split(*endpoints, ",") {
+	for _, end := range endpoints {
 		wg.Add(1)
-		go func(endpoint string) {
-			t := transformer.New(clevertable.New(endpoint, nil, clever)).
+		go func(endp flag.Value) {
+			defer wg.Done()
+			endpoint, ok := endp.(*endpointConf)
+			if !ok {
+				errors <- fmt.Errorf("invalid flag value %#v", end)
+				return
+			}
+
+			t := transformer.New(clevertable.New(endpoint.Name, endpoint.Params, clever)).
 				Map(clevertable.FlattenRow).
 				Map(clevertable.StringifyArrayVals).
 				Table()
-			if err := csvSink.New(t, endpoint+".csv"); err != nil {
+			if err := csvSink.New(t, endpoint.Name+".csv"); err != nil {
 				errors <- err
 			}
-			wg.Done()
-		}(endpoint)
+		}(end)
 	}
 	for err := range errors {
-		log.Fatal(err)
+		log.Fatalf("got err %#v\n", err)
 	}
 }
