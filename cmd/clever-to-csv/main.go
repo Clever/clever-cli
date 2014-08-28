@@ -3,6 +3,7 @@ package main
 import (
 	"code.google.com/p/goauth2/oauth"
 	"flag"
+	"github.com/Clever/clever-to-csv"
 	csvSink "github.com/azylman/optimus/sinks/csv"
 	"github.com/azylman/optimus/transformer"
 	clevergo "gopkg.in/Clever/clever-go.v1"
@@ -39,9 +40,9 @@ func main() {
 	for _, endpoint := range strings.Split(*endpoints, ",") {
 		wg.Add(1)
 		go func(endpoint string) {
-			t := transformer.New(NewCleverTable(endpoint, nil, clever)).
-				Map(FlattenRow).
-				Map(StringifyArrayVals).
+			t := transformer.New(clevertable.New(endpoint, nil, clever)).
+				Map(clevertable.FlattenRow).
+				Map(clevertable.StringifyArrayVals).
 				Table()
 			if err := csvSink.New(t, endpoint+".csv"); err != nil {
 				errors <- err

@@ -1,4 +1,4 @@
-package main
+package clevertable
 
 import (
 	"encoding/json"
@@ -46,7 +46,7 @@ func (t *cleverTable) Stop() {
 	t.stopped = true
 }
 
-func NewCleverTable(endpoint string, params url.Values, clever *clevergo.Clever) optimus.Table {
+func New(endpoint string, params url.Values, clever *clevergo.Clever) optimus.Table {
 	t := &cleverTable{rows: make(chan optimus.Row)}
 	go t.start(endpoint, params, clever)
 	return t
