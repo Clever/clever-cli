@@ -32,18 +32,31 @@ func exitWithArgError(msg string) {
 }
 
 func main() {
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s: [options] endpoint action [query]\n\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "endpoints: %s\n\n", strings.Join(acceptedEndpoints, " "))
-		fmt.Fprintf(os.Stderr, "actions: list\n\n")
-		fmt.Fprintf(os.Stderr, "query:\n  - for list, a JSON-stringified where query parameter\n\n")
+	baseUsage := func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s: [options] endpoint action [action options]\n\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "options:\n")
 		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "\nendpoints: %s\n\n", strings.Join(acceptedEndpoints, " "))
+		fmt.Fprintf(os.Stderr, "actions: list\n\n")
 	}
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
 	token := flag.String("token", "", "API token to use for authentication (required)")
 	output := flag.String("output", "csv", "output method. supported options: csv")
 	help := flag.Bool("help", false, "if true, display help and exit")
+
+	// Action-specifc flags
+	listFlags := flag.NewFlagSet("list options", flag.ExitOnError)
+	listUsage := func() {
+		fmt.Fprintln(os.Stderr, "list:")
+		listFlags.PrintDefaults()
+	}
+	where := listFlags.String("where", "", "a JSON-stringified where query parameter")
+
+	flag.Usage = func() {
+		baseUsage()
+		fmt.Fprintln(os.Stderr, "action options:\n")
+		listUsage()
+	}
 	flag.Parse()
 
 	if *help {
@@ -75,9 +88,10 @@ func main() {
 		exitWithArgError(fmt.Sprintf("'%s' is not a valid action", action))
 	}
 
-	query := ""
 	if len(flag.Args()) > 2 {
-		query = flag.Args()[2]
+		listFlags.Parse(flag.Args()[2:])
+	} else {
+		listFlags.Parse([]string{})
 	}
 
 	transport := &oauth.Transport{
@@ -87,8 +101,8 @@ func main() {
 	clever := clevergo.New(client, *host)
 
 	var params url.Values
-	if query != "" {
-		params = url.Values{"where": []string{query}}
+	if *where != "" {
+		params = url.Values{"where": []string{*where}}
 	}
 
 	t := transformer.New(clevertable.New(endpoint, params, clever)).

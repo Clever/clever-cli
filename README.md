@@ -13,12 +13,12 @@ go get github.com/Clever/clever-cli
 ```shell
 $ clever-cli --token=DEMO_TOKEN teachers list
 $ clever-cli --token=DEMO_TOKEN sections list
-$ clever-cli --token=DEMO_TOKEN sections list '{"subject":"math"}'
+$ clever-cli --token=DEMO_TOKEN sections list --where='{"subject":"math"}'
 ```
 
 ## Usage
 
-`clever-cli [options] endpoint action [query]`
+`clever-cli [options] endpoint action [action options]`
 
 ### Options
 
@@ -39,7 +39,11 @@ Valid options are `students`, `schools`, `sections`, or `teachers`.
 
 What you want to do with that endpoint. Valid options are list, which returns all the results.
 
-### Query
+### Action options
 
-A string that modifies the request to Clever. Meaning varies based on `action`.
-For `list`, it is a JSON-string that will be sent as a `where` query.
+A set of optional command line flags that modify the request to the Clever API.
+Varies based on action type.
+
+#### List
+
+  - where="": a JSON-stringified where query parameter
