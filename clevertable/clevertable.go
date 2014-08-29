@@ -2,8 +2,8 @@ package clevertable
 
 import (
 	"encoding/json"
-	"github.com/azylman/optimus"
 	clevergo "gopkg.in/Clever/clever-go.v1"
+	"gopkg.in/azylman/optimus.v1"
 	"net/url"
 )
 

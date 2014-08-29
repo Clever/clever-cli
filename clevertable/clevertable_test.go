@@ -1,8 +1,8 @@
 package clevertable
 
 import (
-	"github.com/azylman/optimus"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/azylman/optimus.v1"
 	"testing"
 )
 
