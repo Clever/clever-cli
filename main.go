@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"github.com/Clever/clever-cli/clevertable"
 	clevergo "gopkg.in/Clever/clever-go.v1"
-	csvSink "gopkg.in/azylman/optimus.v1/sinks/csv"
-	"gopkg.in/azylman/optimus.v1/transformer"
+	"gopkg.in/azylman/optimus.v2"
+	csvSink "gopkg.in/azylman/optimus.v2/sinks/csv"
+	jsonSink "gopkg.in/azylman/optimus.v2/sinks/json"
+	"gopkg.in/azylman/optimus.v2/transformer"
 	"log"
 	"net/url"
 	"os"
@@ -41,7 +43,7 @@ func main() {
 	}
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
 	token := flag.String("token", "", "API token to use for authentication (required)")
-	output := flag.String("output", "csv", "output method. supported options: csv")
+	output := flag.String("output", "csv", "output method. supported options: csv, json")
 	help := flag.Bool("help", false, "if true, display help and exit")
 
 	// Action-specifc flags
@@ -71,7 +73,13 @@ func main() {
 		}
 	}
 
-	if *output != "csv" {
+	var sink optimus.Sink
+	switch *output {
+	case "csv":
+		sink = csvSink.New(os.Stdout)
+	case "json":
+		sink = jsonSink.New(os.Stdout)
+	default:
 		exitWithArgError(fmt.Sprintf("'%s' is not a valid output", *output))
 	}
 
@@ -105,11 +113,10 @@ func main() {
 		params = url.Values{"where": []string{*where}}
 	}
 
-	t := transformer.New(clevertable.New(endpoint, params, clever)).
+	if err := transformer.New(clevertable.New(endpoint, params, clever)).
 		Map(clevertable.FlattenRow).
 		Map(clevertable.StringifyArrayVals).
-		Table()
-	if err := csvSink.New(t, endpoint+".csv"); err != nil {
+		Sink(sink); err != nil {
 		log.Fatal(err)
 	}
 }

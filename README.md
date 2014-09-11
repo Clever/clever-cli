@@ -28,7 +28,7 @@ There is one required command line flag:
 And three optional ones:
   - help=false: if true, display help and exit
   - host="https://api.clever.com": base URL of Clever API
-  - output="csv": output method. currently CSV is the only option
+  - output="csv": output method. supported options: csv, json
 
 ### Endpoint
 
