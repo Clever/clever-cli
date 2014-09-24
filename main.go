@@ -17,6 +17,7 @@ import (
 )
 
 var acceptedEndpoints = []string{"students", "schools", "sections", "teachers"}
+var acceptedActions = []string{"list", "get"}
 
 func validEndpoint(endpoint string) bool {
 	for _, accepted := range acceptedEndpoints {
@@ -39,7 +40,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "options:\n")
 		flag.PrintDefaults()
 		fmt.Fprintf(os.Stderr, "\nendpoints: %s\n\n", strings.Join(acceptedEndpoints, " "))
-		fmt.Fprintf(os.Stderr, "actions: list\n\n")
+		fmt.Fprintf(os.Stderr, "actions: %s\n\n", strings.Join(acceptedActions, " "))
 	}
 	host := flag.String("host", "https://api.clever.com", "base URL of Clever API")
 	token := flag.String("token", "", "API token to use for authentication (required)")
@@ -91,16 +92,6 @@ func main() {
 	if !validEndpoint(endpoint) {
 		exitWithArgError(fmt.Sprintf("'%s' is not a valid endpoint", endpoint))
 	}
-	action := flag.Args()[1]
-	if action != "list" {
-		exitWithArgError(fmt.Sprintf("'%s' is not a valid action", action))
-	}
-
-	if len(flag.Args()) > 2 {
-		listFlags.Parse(flag.Args()[2:])
-	} else {
-		listFlags.Parse([]string{})
-	}
 
 	transport := &oauth.Transport{
 		Token: &oauth.Token{AccessToken: *token},
@@ -108,12 +99,33 @@ func main() {
 	client := transport.Client()
 	clever := clevergo.New(client, *host)
 
-	var params url.Values
-	if *where != "" {
-		params = url.Values{"where": []string{*where}}
+	action := flag.Args()[1]
+
+	var table optimus.Table
+
+	switch action {
+	case "list":
+		if len(flag.Args()) > 2 {
+			listFlags.Parse(flag.Args()[2:])
+		} else {
+			listFlags.Parse([]string{})
+		}
+		var params url.Values
+		if *where != "" {
+			params = url.Values{"where": []string{*where}}
+		}
+		table = clevertable.NewList(endpoint, params, clever)
+	case "get":
+		if len(flag.Args()) != 3 {
+			exitWithArgError(fmt.Sprintf("get action requires an <id> argument"))
+		}
+		id := flag.Args()[2]
+		table = clevertable.NewGet(endpoint, id, clever)
+	default:
+		exitWithArgError(fmt.Sprintf("'%s' is not a valid action", action))
 	}
 
-	if err := transformer.New(clevertable.New(endpoint, params, clever)).
+	if err := transformer.New(table).
 		Map(clevertable.FlattenRow).
 		Map(clevertable.StringifyArrayVals).
 		Sink(sink); err != nil {

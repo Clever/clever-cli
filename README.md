@@ -14,6 +14,7 @@ go get github.com/Clever/clever-cli
 $ clever-cli --token=DEMO_TOKEN teachers list
 $ clever-cli --token=DEMO_TOKEN sections list
 $ clever-cli --token=DEMO_TOKEN sections list --where='{"subject":"math"}'
+$ clever-cli --token=DEMO_TOKEN teachers get EXAMPLEID
 ```
 
 ## Usage
@@ -37,7 +38,7 @@ Valid options are `students`, `schools`, `sections`, or `teachers`.
 
 ### Action
 
-What you want to do with that endpoint. Valid options are list, which returns all the results.
+What you want to do with that endpoint. Valid options are list (which returns all the results), and get (which returns a specific object by Clever ID).
 
 ### Action options
 
@@ -47,6 +48,10 @@ Varies based on action type.
 #### List
 
   - where="": a JSON-stringified where query parameter
+
+#### Get
+
+  - Get takes a single positional argument, which is the Clever ID of the object you wish to get.
 
 ## Local Development
 

@@ -13,7 +13,7 @@ type cleverTable struct {
 	rows    chan optimus.Row
 }
 
-func (t *cleverTable) start(endpoint string, params url.Values, clever *clevergo.Clever) {
+func (t *cleverTable) startList(endpoint string, params url.Values, clever *clevergo.Clever) {
 	defer t.Stop()
 	defer close(t.rows)
 
@@ -31,6 +31,20 @@ func (t *cleverTable) start(endpoint string, params url.Values, clever *clevergo
 	}
 }
 
+func (t *cleverTable) startGet(endpoint, id string, clever *clevergo.Clever) {
+	defer t.Stop()
+	defer close(t.rows)
+
+	resp := &struct {
+		Data optimus.Row
+	}{}
+	if err := clever.Query("/v1.1/"+endpoint+"/"+id, nil, &resp); err != nil {
+		t.err = err
+		return
+	}
+	t.rows <- resp.Data
+}
+
 func (t *cleverTable) Rows() <-chan optimus.Row {
 	return t.rows
 }
@@ -46,10 +60,17 @@ func (t *cleverTable) Stop() {
 	t.stopped = true
 }
 
-// New creates a Table that reads from Clever's API, using the specified parameters.
-func New(endpoint string, params url.Values, clever *clevergo.Clever) optimus.Table {
+// NewList creates a Table that reads from Clever's Paged API, using the specified parameters.
+func NewList(endpoint string, params url.Values, clever *clevergo.Clever) optimus.Table {
 	t := &cleverTable{rows: make(chan optimus.Row)}
-	go t.start(endpoint, params, clever)
+	go t.startList(endpoint, params, clever)
+	return t
+}
+
+// NewGet creates a Table that reads a single object from Clever's API, using the specified parameters.
+func NewGet(endpoint string, id string, clever *clevergo.Clever) optimus.Table {
+	t := &cleverTable{rows: make(chan optimus.Row)}
+	go t.startGet(endpoint, id, clever)
 	return t
 }
 
