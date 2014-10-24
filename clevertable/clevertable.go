@@ -5,6 +5,7 @@ import (
 	clevergo "gopkg.in/Clever/clever-go.v1"
 	"gopkg.in/azylman/optimus.v2"
 	"net/url"
+	"strings"
 )
 
 type cleverTable struct {
@@ -45,6 +46,39 @@ func (t *cleverTable) startGet(endpoint, id string, clever *clevergo.Clever) {
 	t.rows <- resp.Data
 }
 
+// clever-go.Request accepts the request body as an interface, so wrap it here to avoid
+// unnecessary unmarshaling/marshaling
+type marshalWrapper struct {
+	Body string
+}
+
+func (m marshalWrapper) MarshalJSON() ([]byte, error) {
+	return []byte(m.Body), nil
+}
+
+func (t *cleverTable) startPatch(endpoint, id string, jsonBody string, clever *clevergo.Clever) {
+	defer t.Stop()
+	defer close(t.rows)
+
+	resp := &struct {
+		Data optimus.Row
+	}{}
+
+	index := strings.Index(endpoint, "properties")
+	path := ""
+	if index != -1 {
+		path = "/v1.1/" + endpoint[0:index] + "s/" + id + "/properties"
+	} else {
+		path = "/v1.1/" + endpoint + "/" + id
+	}
+
+	if err := clever.Request("PATCH", path, nil, marshalWrapper{jsonBody}, &resp); err != nil {
+		t.err = err
+		return
+	}
+	t.rows <- resp.Data
+}
+
 func (t *cleverTable) Rows() <-chan optimus.Row {
 	return t.rows
 }
@@ -71,6 +105,14 @@ func NewList(endpoint string, params url.Values, clever *clevergo.Clever) optimu
 func NewGet(endpoint string, id string, clever *clevergo.Clever) optimus.Table {
 	t := &cleverTable{rows: make(chan optimus.Row)}
 	go t.startGet(endpoint, id, clever)
+	return t
+}
+
+// NewPatch creates a Table that returns the response of an update to a single object
+// or object's properties from Clever's API with the specified JSON body
+func NewPatch(endpoint string, id string, jsonBody string, clever *clevergo.Clever) optimus.Table {
+	t := &cleverTable{rows: make(chan optimus.Row)}
+	go t.startPatch(endpoint, id, jsonBody, clever)
 	return t
 }
 

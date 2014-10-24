@@ -16,8 +16,8 @@ import (
 	"strings"
 )
 
-var acceptedEndpoints = []string{"students", "schools", "sections", "teachers"}
-var acceptedActions = []string{"list", "get"}
+var acceptedEndpoints = []string{"students", "schools", "sections", "teachers", "studentproperties", "teacherproperties"}
+var acceptedActions = []string{"list", "get", "patch"}
 
 func validEndpoint(endpoint string) bool {
 	for _, accepted := range acceptedEndpoints {
@@ -121,6 +121,13 @@ func main() {
 		}
 		id := flag.Args()[2]
 		table = clevertable.NewGet(endpoint, id, clever)
+	case "patch":
+		if len(flag.Args()) != 4 {
+			exitWithArgError(fmt.Sprintf("patch action requires <id> and <json_body> arguments"))
+		}
+		id := flag.Args()[2]
+		jsonBody := flag.Args()[3]
+		table = clevertable.NewPatch(endpoint, id, jsonBody, clever)
 	default:
 		exitWithArgError(fmt.Sprintf("'%s' is not a valid action", action))
 	}
