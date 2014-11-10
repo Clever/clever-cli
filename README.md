@@ -4,6 +4,8 @@
 
 ## Installing
 
+You can install an official release from the [Github releases page](https://github.com/Clever/clever-cli/releases) or install from source via:
+
 ```shell
 go get github.com/Clever/clever-cli
 ```
