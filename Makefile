@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PKG = github.com/Clever/clever-cli
-SUBPKGSREL := $(shell ls -d */ | grep -v bin | grep -v deb)
+SUBPKGSREL := $(shell ls -d */ | grep -v bin | grep -v deb | grep -v build)
 SUBPKGS = $(addprefix $(PKG)/,$(SUBPKGSREL))
 PKGS = $(PKG) $(SUBPKGS)
 VERSION := $(shell cat VERSION)
