@@ -1,19 +1,20 @@
 package main
 
 import (
-	"code.google.com/p/goauth2/oauth"
 	"flag"
 	"fmt"
-	"github.com/Clever/clever-cli/clevertable"
-	clevergo "gopkg.in/Clever/clever-go.v1"
-	"gopkg.in/azylman/optimus.v2"
-	csvSink "gopkg.in/azylman/optimus.v2/sinks/csv"
-	jsonSink "gopkg.in/azylman/optimus.v2/sinks/json"
-	"gopkg.in/azylman/optimus.v2/transformer"
 	"log"
 	"net/url"
 	"os"
 	"strings"
+
+	"code.google.com/p/goauth2/oauth"
+	"github.com/Clever/clever-cli/clevertable"
+	clevergo "gopkg.in/Clever/clever-go.v1"
+	"gopkg.in/Clever/optimus.v3"
+	csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
+	jsonSink "gopkg.in/Clever/optimus.v3/sinks/json"
+	"gopkg.in/Clever/optimus.v3/transformer"
 )
 
 var acceptedEndpoints = []string{"students", "schools", "sections", "teachers"}

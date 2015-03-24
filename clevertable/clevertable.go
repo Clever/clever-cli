@@ -2,9 +2,10 @@ package clevertable
 
 import (
 	"encoding/json"
-	clevergo "gopkg.in/Clever/clever-go.v1"
-	"gopkg.in/azylman/optimus.v2"
 	"net/url"
+
+	clevergo "gopkg.in/Clever/clever-go.v1"
+	"gopkg.in/Clever/optimus.v3"
 )
 
 type cleverTable struct {

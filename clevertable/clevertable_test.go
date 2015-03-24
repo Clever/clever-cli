@@ -1,9 +1,10 @@
 package clevertable
 
 import (
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/azylman/optimus.v2"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/Clever/optimus.v3"
 )
 
 func TestFlattenRow(t *testing.T) {
