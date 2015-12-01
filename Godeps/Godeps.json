@@ -1,0 +1,38 @@
+{
+	"ImportPath": "github.com/Clever/clever-cli",
+	"GoVersion": "go1.5.1",
+	"Packages": [
+		"github.com/Clever/clever-cli",
+		"github.com/Clever/clever-cli/clevertable"
+	],
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/goauth2/oauth",
+			"Comment": "weekly-56",
+			"Rev": "'afe77d958c701557ec5dc56f6936fcc194d15520'"
+		},
+		{
+			"ImportPath": "github.com/facebookgo/errgroup",
+			"Rev": "46ea9736c913dd08039fecd085b9622a499aa0ad"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "2eaa4b48b8954bf871229043b8064ca156a542a5"
+		},
+		{
+			"ImportPath": "gopkg.in/Clever/clever-go.v1",
+			"Comment": "v1.4.0",
+			"Rev": "f1e343c2a1606e04356756245ab50c02d776f359"
+		},
+		{
+			"ImportPath": "gopkg.in/Clever/optimus.v3",
+			"Comment": "v3.6.2",
+			"Rev": "28173851fb524967c8a6013379f69b7a0a01b361"
+		},
+		{
+			"ImportPath": "gopkg.in/fatih/set.v0",
+			"Comment": "v0.1.0-3-g27c4092",
+			"Rev": "27c40922c40b43fe04554d8223a402af3ea333f3"
+		}
+	]
+}
