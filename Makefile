@@ -1,8 +1,6 @@
 SHELL := /bin/bash
 PKG = github.com/Clever/clever-cli
-SUBPKGSREL := $(shell ls -d */ | grep -v bin | grep -v deb | grep -v build)
-SUBPKGS = $(addprefix $(PKG)/,$(SUBPKGSREL))
-PKGS = $(PKG) $(SUBPKGS)
+PKGS := $(shell go list ./... | grep -v /vendor)
 VERSION := $(shell cat VERSION)
 EXECUTABLE := clever
 BUILDS := \
@@ -23,14 +21,19 @@ export GO15VENDOREXPERIMENT = 1
 
 test: $(PKGS)
 
-$(GOPATH)/bin/golint:
-	@go get github.com/golang/lint/golint
+GOLINT := $(GOPATH)/bin/golint
+$(GOLINT):
+	go get github.com/golang/lint/golint
 
-$(PKGS): $(GOPATH)/bin/golint
+GODEP := $(GOPATH)/bin/godep
+$(GODEP):
+	go get -u github.com/tools/godep
+
+$(PKGS): $(GOLINT)
 	@go get -d -t $@
 	@gofmt -w=true $(GOPATH)/src/$@*/**.go
 	@echo "LINTING..."
-	@$(GOPATH)/bin/golint $(GOPATH)/src/$@*/**.go
+	@$(GOLINT) $(GOPATH)/src/$@*/**.go
 	@echo ""
 ifeq ($(COVERAGE),1)
 	@go test -cover -coverprofile=$(GOPATH)/src/$@/c.out $@ -test.v
@@ -59,3 +62,7 @@ clean:
 
 run:
 	@go run main.go
+
+vendor: $(GODEP)
+	$(GODEP) save $(PKGS)
+	find vendor/ -path '*/vendor' -type d | xargs -IX rm -r X # remove any nested vendor directories
