@@ -5,20 +5,20 @@ notify:
   email:
     recipients:
       - drone@clever.com
-  hipchat:
-    room: Clever-Dev-CI
-    token: {{hipchat_token}}
-    on_started: true
-    on_success: true
+  slack:
+    on_started: false
+    on_success: false
     on_failure: true
+    webhook_url: $$slack_webhook
 publish:
   github:
-    branch: master
     script:
-      - make release
+    - make release
     artifacts:
-      - release
+    - release
     tag: v$(cat VERSION)
-    token: {{github_token}}
+    token: $$github_token
     user: Clever
     repo: clever-cli
+    when:
+      branch: master
