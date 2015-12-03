@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PKG = github.com/Clever/clever-cli
-PKGS := $(shell go list ./... | grep -v /vendor)
+PKGS := $(shell go list ./... | grep -v /vendor | grep -v /bin | grep -v /deb | grep -v /build)
 VERSION := $(shell cat VERSION)
 EXECUTABLE := clever
 BUILDS := \
