@@ -10,7 +10,7 @@ BUILDS := \
 COMPRESSED_BUILDS := $(BUILDS:%=%.tar.gz)
 RELEASE_ARTIFACTS := $(COMPRESSED_BUILDS:build/%=release/%)
 
-.PHONY: test $(PKGS) clean run
+.PHONY: test $(PKGS) clean run vendor
 
 GOVERSION := $(shell go version | grep 1.5)
 ifeq "$(GOVERSION)" ""
