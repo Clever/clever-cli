@@ -8,8 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"code.google.com/p/goauth2/oauth"
 	"github.com/Clever/clever-cli/clevertable"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
 	clevergo "gopkg.in/Clever/clever-go.v1"
 	"gopkg.in/Clever/optimus.v3"
 	csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
@@ -58,7 +59,7 @@ func main() {
 
 	flag.Usage = func() {
 		baseUsage()
-		fmt.Fprintln(os.Stderr, "action options:\n")
+		fmt.Fprint(os.Stderr, "action options:\n\n")
 		listUsage()
 	}
 	flag.Parse()
@@ -94,10 +95,9 @@ func main() {
 		exitWithArgError(fmt.Sprintf("'%s' is not a valid endpoint", endpoint))
 	}
 
-	transport := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: *token},
-	}
-	client := transport.Client()
+	client := oauth2.NewClient(context.TODO(), oauth2.StaticTokenSource(&oauth2.Token{
+		AccessToken: *token,
+	}))
 	clever := clevergo.New(client, *host)
 
 	action := flag.Args()[1]
