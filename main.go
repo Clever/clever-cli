@@ -18,7 +18,7 @@ import (
 	"gopkg.in/Clever/optimus.v3/transformer"
 )
 
-var acceptedEndpoints = []string{"students", "schools", "sections", "teachers"}
+var acceptedEndpoints = []string{"students", "schools", "sections", "teachers", "contacts"}
 var acceptedActions = []string{"list", "get"}
 
 func validEndpoint(endpoint string) bool {
