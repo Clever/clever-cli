@@ -19,6 +19,12 @@ $ clever-cli --token=DEMO_TOKEN sections list --where='{"subject":"math"}'
 $ clever-cli --token=DEMO_TOKEN teachers get EXAMPLEID
 ```
 
+On Windows, be sure to escape your inner quotes:
+
+```shell
+clever-cli --token=DEMO_TOKEN students list —where=“{\”subject\”:\”math\”}”
+```
+
 ## Usage
 
 `clever-cli [options] endpoint action [action options]`
