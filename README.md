@@ -1,3 +1,5 @@
+# DEPRECATED - Clever is no longer supporting or maintaining this repository.
+
 # clever-cli
 
 `clever-cli` is a command line tool to access the Clever API.
