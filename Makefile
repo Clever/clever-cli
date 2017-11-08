@@ -22,27 +22,27 @@ test: $(PKGS)
 $(PKGS): golang-test-all-deps
 	$(call golang-test-all,$@)
 
-
 build/$(EXECUTABLE)-v$(VERSION)-darwin-amd64:
 	GOARCH=amd64 GOOS=darwin go build -o "$@/$(EXECUTABLE)"
 build/$(EXECUTABLE)-v$(VERSION)-linux-amd64:
 	GOARCH=amd64 GOOS=linux go build -o "$@/$(EXECUTABLE)"
 build/$(EXECUTABLE)-v$(VERSION)-windows-amd64:
 	GOARCH=amd64 GOOS=windows go build -o "$@/$(EXECUTABLE).exe"
+
 build: $(BUILDS)
 %.tar.gz: %
 	tar -C `dirname $<` -zcvf "$<.tar.gz" `basename $<`
+
+release: $(RELEASE_ARTIFACTS)
 $(RELEASE_ARTIFACTS): release/% : build/%
 	mkdir -p release
 	cp $< $@
-release: $(RELEASE_ARTIFACTS)
 
 clean:
 	rm -rf build release
 
 run:
 	@go run main.go
-
 
 install_deps: golang-dep-vendor-deps
 	$(call golang-dep-vendor)
