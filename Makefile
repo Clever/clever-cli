@@ -15,15 +15,13 @@ RELEASE_ARTIFACTS := $(COMPRESSED_BUILDS:build/%=release/%)
 
 .PHONY: test $(PKGS) clean run vendor
 
-$(eval $(call golang-version-check,1.8))
+$(eval $(call golang-version-check,1.9))
 
 test: $(PKGS)
 
 $(PKGS): golang-test-all-deps
 	$(call golang-test-all,$@)
 
-vendor: golang-godep-vendor-deps
-	$(call golang-godep-vendor,$(PKGS))
 
 build/$(EXECUTABLE)-v$(VERSION)-darwin-amd64:
 	GOARCH=amd64 GOOS=darwin go build -o "$@/$(EXECUTABLE)"
@@ -44,3 +42,7 @@ clean:
 
 run:
 	@go run main.go
+
+
+install_deps: golang-dep-vendor-deps
+	$(call golang-dep-vendor)
