@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -9,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/Clever/clever-cli/clevertable"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	clevergo "gopkg.in/Clever/clever-go.v1"
 	"gopkg.in/Clever/optimus.v3"
