@@ -22,10 +22,6 @@
 
 
 [[constraint]]
-  name = "github.com/Clever/clever-cli"
-  version = "0.3.0"
-
-[[constraint]]
   name = "github.com/stretchr/testify"
 
 [[constraint]]
