@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/Clever/clever-cli"
-  packages = ["clevertable"]
-  revision = "78cd9fff1c9175f7b5952bef76bff9654d8e9e03"
-  version = "0.3.0"
-
-[[projects]]
   name = "github.com/facebookgo/errgroup"
   packages = ["."]
   revision = "46ea9736c913dd08039fecd085b9622a499aa0ad"
@@ -60,6 +54,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8d876f88444c49db1cb0e2b000d455f677da69e9a1a4a98e0c9976b4f8c9cea7"
+  inputs-digest = "e8529b39ebf16c61b3942dc2cc095922d92096f5db341e55d7f1db22875a4a44"
   solver-name = "gps-cdcl"
   solver-version = 1
